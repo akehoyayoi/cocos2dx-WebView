@@ -5,14 +5,14 @@
 #ifndef __Cocos2d_Plugin_WebView_H_
 #define __Cocos2d_Plugin_WebView_H_
 
-#include "ui/UIWidget.h"
-#include "base/CCData.h"
+#include "base_nodes/CCNode.h"
+#include "CCData.h"
 
 namespace cocos2d {
 namespace plugin {
 class WebViewImpl;
 
-class WebView : public cocos2d::ui::Widget {
+class WebView : public cocos2d::CCNode {
 public:
     /**
     * Allocates and initializes a WebView.
@@ -67,7 +67,7 @@ public:
     * @param encoding the encoding of the data.
     * @param baseURL The base URL for the content.
     */
-    void loadData(const cocos2d::Data &data, const std::string &MIMEType, const std::string &encoding, const std::string &baseURL);
+    void loadData(cocos2d::extension::CCData &data, const std::string &MIMEType, const std::string &encoding, const std::string &baseURL);
 
     /**
     * Sets the main page content and base URL.
@@ -130,9 +130,9 @@ public:
     */
     void setScalesPageToFit(const bool scalesPageToFit);
 
-    virtual void draw(cocos2d::Renderer *renderer, cocos2d::Mat4 const &transform, uint32_t flags) override;
+    virtual void draw();
 
-    virtual void setVisible(bool visible) override;
+    virtual void setVisible(bool visible);
 
 private:
     cocos2d::plugin::WebViewImpl *_impl;

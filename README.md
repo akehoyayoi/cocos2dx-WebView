@@ -1,8 +1,8 @@
-# DEPRECATED
 This WebView merged into cocos2d-x3.3!
+This repository for cocos2d-x ver2.X
 
 # Require
-* cocos2d-x ver3.0(or greater
+* cocos2d-x ver2.0(or greater
 * android-10(or greater
 
 # How to setup

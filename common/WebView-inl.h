@@ -2,8 +2,8 @@
 #define __CC_WebView_INL_H_
 
 #include "WebView.h"
-#include "CCGLView.h"
-#include "base/CCDirector.h"
+#include "CCEGLView.h"
+#include "CCDirector.h"
 #include "platform/CCFileUtils.h"
 
 namespace cocos2d {
@@ -28,7 +28,8 @@ void WebView::setJavascriptInterfaceScheme(const std::string &scheme) {
     _impl->setJavascriptInterfaceScheme(scheme);
 }
 
-void WebView::loadData(const cocos2d::Data &data, const std::string &MIMEType, const std::string &encoding, const std::string &baseURL) {
+void WebView::loadData(cocos2d::extension::CCData &data, const std::string &MIMEType,
+                       const std::string &encoding, const std::string &baseURL) {
     _impl->loadData(data, MIMEType, encoding, baseURL);
 }
 
@@ -76,13 +77,13 @@ void WebView::setScalesPageToFit(bool const scalesPageToFit) {
     _impl->setScalesPageToFit(scalesPageToFit);
 }
 
-void WebView::draw(cocos2d::Renderer *renderer, cocos2d::Mat4 const &transform, uint32_t flags) {
-    cocos2d::ui::Widget::draw(renderer, transform, flags);
-    _impl->draw(renderer, transform, flags);
+void WebView::draw() {
+    CCNode::draw();
+    _impl->draw();
 }
 
 void WebView::setVisible(bool visible) {
-    Node::setVisible(visible);
+    CCNode::setVisible(visible);
     _impl->setVisible(visible);
 }
 } // namespace cocos2d

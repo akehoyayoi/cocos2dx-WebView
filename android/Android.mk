@@ -16,13 +16,15 @@ LOCAL_WHOLE_STATIC_LIBRARIES := cocos2dx_static
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
 LOCAL_EXPORT_C_INCLUDES += $(LOCAL_PATH)/../common
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../cocos2d/cocos/2d \
-                    $(LOCAL_PATH)/../../../cocos2d/cocos/platform \
-                    $(LOCAL_PATH)/../../../cocos2d/cocos/platform/android \
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../cocos2d-x/cocos2dx/base_nodes \
+                    $(LOCAL_PATH)/../../cocos2d-x/cocos2dx/platform \
+                    $(LOCAL_PATH)/../../cocos2d-x/cocos2dx/platform/android \
+                    $(LOCAL_PATH)/../../cocos2d-x/extensions \
+                    $(LOCAL_PATH)/../../cocos2d-x/extensions/CCBReader \
                     $(LOCAL_PATH)/../common \
                     $(LOCAL_PATH)/ \
                     $(LOCAL_PATH)/jni
 
 include $(BUILD_STATIC_LIBRARY)
 
-$(call import-module,.)
+# $(call import-module,./)

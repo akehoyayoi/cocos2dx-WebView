@@ -6,12 +6,12 @@
 
 #include "WebViewImpl_iOS.h"
 #import "UIWebViewWrapper.h"
-#include "renderer/CCRenderer.h"
 #include "WebView.h"
 #include "CCDirector.h"
-#include "CCGLView.h"
-#include "CCEAGLView.h"
+#include "CCEGLView.h"
 #include "platform/CCFileUtils.h"
+
+#import "EAGLView.h"
 
 namespace cocos2d {
 namespace plugin {
@@ -51,8 +51,10 @@ void WebViewImpl::setJavascriptInterfaceScheme(const std::string &scheme) {
     [_uiWebViewWrapper setJavascriptInterfaceScheme:scheme];
 }
 
-void WebViewImpl::loadData(const Data &data, const std::string &MIMEType, const std::string &encoding, const std::string &baseURL) {
-    std::string dataString(reinterpret_cast<char *>(data.getBytes()), static_cast<unsigned int>(data.getSize()));
+void WebViewImpl::loadData(cocos2d::extension::CCData &data, const std::string &MIMEType, const std::string &encoding, const std::string &baseURL) {
+    const auto bytes = data.getBytes();
+    const auto size = data.getSize();
+    std::string dataString(reinterpret_cast<char *>(bytes), static_cast<unsigned int>(size));
     [_uiWebViewWrapper loadData:dataString MIMEType:MIMEType textEncodingName:encoding baseURL:baseURL];
 }
 
@@ -65,7 +67,7 @@ void WebViewImpl::loadUrl(const std::string &url) {
 }
 
 void WebViewImpl::loadFile(const std::string &fileName) {
-    auto fullPath = cocos2d::FileUtils::getInstance()->fullPathForFilename(fileName);
+    auto fullPath = cocos2d::CCFileUtils::sharedFileUtils()->fullPathForFilename(fileName.c_str());
     [_uiWebViewWrapper loadFile:fullPath];
 }
 
@@ -101,28 +103,27 @@ void WebViewImpl::setScalesPageToFit(const bool scalesPageToFit) {
     [_uiWebViewWrapper setScalesPageToFit:scalesPageToFit];
 }
 
-void WebViewImpl::draw(cocos2d::Renderer *renderer, cocos2d::Mat4 const &transform, uint32_t flags) {
-    if (flags & cocos2d::Node::FLAGS_TRANSFORM_DIRTY) {
-        auto direcrot = cocos2d::Director::getInstance();
-        auto glView = direcrot->getOpenGLView();
-        auto frameSize = glView->getFrameSize();
-        auto scaleFactor = [static_cast<CCEAGLView *>(glView->getEAGLView()) contentScaleFactor];
+void WebViewImpl::draw() {
+    auto director = CCDirector::sharedDirector();
+    auto glView = director->getOpenGLView();
+    auto frameSize = glView->getFrameSize();
+    auto scaleFactor = [[EAGLView sharedEGLView] contentScaleFactor];
 
-        auto winSize = direcrot->getWinSize();
+    auto winSize = director->getWinSize();
+    auto wv = this->_webView;
+    auto wvSize = wv->getContentSize();
 
-        auto leftBottom = this->_webView->convertToWorldSpace(cocos2d::Vec2::ZERO);
-        auto rightTop = this->_webView->convertToWorldSpace(cocos2d::Vec2(this->_webView->getContentSize().width, this->_webView->getContentSize().height));
-
-        auto x = (frameSize.width / 2 + (leftBottom.x - winSize.width / 2) * glView->getScaleX()) / scaleFactor;
-        auto y = (frameSize.height / 2 - (rightTop.y - winSize.height / 2) * glView->getScaleY()) / scaleFactor;
-        auto width = (rightTop.x - leftBottom.x) * glView->getScaleX() / scaleFactor;
-        auto height = (rightTop.y - leftBottom.y) * glView->getScaleY() / scaleFactor;
-
-        [_uiWebViewWrapper setFrameWithX:x
-                                      y:y
-                                  width:width
-                                 height:height];
-    }
+    auto leftBottom = wv->convertToWorldSpace(cocos2d::CCPointZero);
+    auto rightTop = wv->convertToWorldSpace(cocos2d::CCPoint(wvSize.width,wvSize.height));
+    auto x = (frameSize.width / 2 + (leftBottom.x - winSize.width / 2) * glView->getScaleX()) / scaleFactor;
+    auto y = (frameSize.height / 2 - (rightTop.y - winSize.height / 2) * glView->getScaleY()) / scaleFactor;
+    auto width = (rightTop.x - leftBottom.x) * glView->getScaleX() / scaleFactor;
+    auto height = (rightTop.y - leftBottom.y) * glView->getScaleY() / scaleFactor;
+    
+    [_uiWebViewWrapper setFrameWithX:x
+                                   y:y
+                               width:width
+                              height:height];
 }
 
 void WebViewImpl::setVisible(bool visible) {

@@ -6,8 +6,7 @@
 #include "WebView.h"
 #include "org_cocos2dx_lib_Cocos2dxWebViewHelper.h"
 #include "jni/JniHelper.h"
-#include "CCGLView.h"
-#include "base/CCDirector.h"
+#include "CCDirector.h"
 #include "platform/CCFileUtils.h"
 #include <unordered_map>
 
@@ -184,7 +183,7 @@ void setWebViewVisibleJNI(const int index, const bool visible) {
 
 std::string getUrlStringByFileName(const std::string &fileName) {
     const std::string basePath("file:///android_asset/");
-    std::string fullPath = cocos2d::FileUtils::getInstance()->fullPathForFilename(fileName);
+    std::string fullPath = cocos2d::CCFileUtils::sharedFileUtils()->fullPathForFilename(fileName.c_str());
     const std::string assetsPath("assets/");
 
     std::string urlString;
@@ -212,7 +211,7 @@ WebViewImpl::~WebViewImpl() {
     s_WebViewImpls.erase(_viewTag);
 }
 
-void WebViewImpl::loadData(const Data &data, const std::string &MIMEType, const std::string &encoding, const std::string &baseURL) {
+void WebViewImpl::loadData(cocos2d::extension::CCData &data, const std::string &MIMEType, const std::string &encoding, const std::string &baseURL) {
     std::string dataString(reinterpret_cast<char *>(data.getBytes()), static_cast<unsigned int>(data.getSize()));
     loadDataJNI(_viewTag, dataString, MIMEType, encoding, baseURL);
 }
@@ -307,24 +306,24 @@ void WebViewImpl::onJsCallback(const int viewTag, const std::string &message){
     }
 }
 
-void WebViewImpl::draw(cocos2d::Renderer *renderer, cocos2d::Mat4 const &transform, uint32_t flags) {
-    if (flags & cocos2d::Node::FLAGS_TRANSFORM_DIRTY) {
-        auto directorInstance = cocos2d::Director::getInstance();
-        auto glView = directorInstance->getOpenGLView();
-        auto frameSize = glView->getFrameSize();
+void WebViewImpl::draw() {
+    auto director = CCDirector::sharedDirector();
+    auto glView = director->getOpenGLView();
+    auto frameSize = glView->getFrameSize();
 
-        auto winSize = directorInstance->getWinSize();
+    auto winSize = director->getWinSize();
+    auto wv = this->_webView;
+    auto wvSize = wv->getContentSize();
 
-        auto leftBottom = this->_webView->convertToWorldSpace(cocos2d::Point::ZERO);
-        auto rightTop = this->_webView->convertToWorldSpace(cocos2d::Point(this->_webView->getContentSize().width,this->_webView->getContentSize().height));
+    auto leftBottom = wv->convertToWorldSpace(cocos2d::CCPointZero);
+    auto rightTop = wv->convertToWorldSpace(cocos2d::CCPoint(wvSize.width,wvSize.height));
 
-        auto uiLeft = frameSize.width / 2 + (leftBottom.x - winSize.width / 2 ) * glView->getScaleX();
-        auto uiTop = frameSize.height /2 - (rightTop.y - winSize.height / 2) * glView->getScaleY();
+    auto uiLeft = frameSize.width / 2 + (leftBottom.x - winSize.width / 2 ) * glView->getScaleX();
+    auto uiTop = frameSize.height /2 - (rightTop.y - winSize.height / 2) * glView->getScaleY();
 
-        setWebViewRectJNI(_viewTag,uiLeft,uiTop,
-                        (rightTop.x - leftBottom.x) * glView->getScaleX(),
-                        (rightTop.y - leftBottom.y) * glView->getScaleY());
-    }
+    setWebViewRectJNI(_viewTag,uiLeft,uiTop,
+        (rightTop.x - leftBottom.x) * glView->getScaleX(),
+        (rightTop.y - leftBottom.y) * glView->getScaleY());
 }
 
 void WebViewImpl::setVisible(bool visible) {

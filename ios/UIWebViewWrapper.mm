@@ -5,10 +5,9 @@
 
 #import "UIWebViewWrapper.h"
 #import "WebView.h"
-#import "CCGLView.h"
-#import "CCEAGLView.h"
+#import "CCEGLView.h"
 #import "CCDirector.h"
-
+#import "EAGLView.h"
 
 @interface UIWebViewWrapper () <UIWebViewDelegate>
 @property(nonatomic, retain) UIWebView *uiWebView;
@@ -46,8 +45,7 @@
         self.uiWebView.delegate = self;
     }
     if (!self.uiWebView.superview) {
-        auto view = cocos2d::Director::getInstance()->getOpenGLView();
-        auto eaglview = (CCEAGLView *) view->getEAGLView();
+        EAGLView* eaglview = [EAGLView sharedEGLView];
         [eaglview addSubview:self.uiWebView];
     }
 }

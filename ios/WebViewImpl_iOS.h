@@ -7,12 +7,12 @@
 
 #include <iosfwd>
 
+#include "CCData.h"
+
 @class UIWebViewWrapper;
 
 namespace cocos2d {
-class Data;
-class Renderer;
-class Mat4;
+
 namespace plugin {
 class WebView;
 
@@ -24,7 +24,7 @@ public:
 
     void setJavascriptInterfaceScheme(const std::string &scheme);
 
-    void loadData(const cocos2d::Data &data, const std::string &MIMEType, const std::string &encoding, const std::string &baseURL);
+    void loadData(cocos2d::extension::CCData &data, const std::string &MIMEType, const std::string &encoding, const std::string &baseURL);
 
     void loadHTMLString(const std::string &string, const std::string &baseURL);
 
@@ -48,7 +48,7 @@ public:
 
     void setScalesPageToFit(const bool scalesPageToFit);
 
-    virtual void draw(cocos2d::Renderer *renderer, cocos2d::Mat4 const &transform, uint32_t flags);
+    virtual void draw();
 
     virtual void setVisible(bool visible);
 
